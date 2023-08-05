@@ -1,4 +1,26 @@
 
+module.exports = {
+        networks: {
+                hardhat: {
+                localhost: {
+                        url: "https://ec2-54-149-194-207.us-west-2.compute.amazonaws.com:8545",
+                        accounts: ["d9c17d521f6104e918586d079ada62584a026e7b765130044f0abf6609ebb955"]
+,                       chainId: 31337
+              ,         gas: 1800
+
+
+                }
+,
+                        forking: {
+                                url: "https://cloudflare-eth.com/"
+, chainId: 31337
+, gas : 1800                    }
+
+                }
+   },
+
+        solidity: "0.8.10",
+};
 
 
 
