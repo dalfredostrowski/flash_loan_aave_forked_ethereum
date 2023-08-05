@@ -57,32 +57,9 @@ undefined
 undefined
 > 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+> await token.connect(impersonatedSigner).transfer(myAddress, "1000000")
+Uncaught:
+InvalidInputError: sender doesn't have enough funds to send tx. The max upfront cost is: 962229651120000000 and the sender's account only has: 355686073134000
 
 Uncaught:
 InvalidInputError: sender doesn't have enough funds to send tx. The max upfront
