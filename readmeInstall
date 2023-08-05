@@ -1,0 +1,36 @@
+
+
+
+
+npx hardhat node --hostname ec2-54-149-194-207.us-west-2.compute.amazonaws.com
+
+
+
+
+https://github.com/NomicFoundation/hardhat/issues/1933
+
+
+
+
+ubuntu@ip-172-31-2-51:~/forkedMainnetFlash$ npx hardhat console
+Welcome to Node.js v20.5.0.
+Type ".help" for more information.
+> const signers = await ethers.getSigners();
+
+undefined
+>
+>
+> const addressWithTokens = "0x20a47086ad3450d06B30eFCeb254C854FeBFB36D"
+undefined
+> await network.provider.send("hardhat_impersonateAccount", [addressWithTokens])
+true
+> const impersonatedSigner = await ethers.getSigner(addressWithTokens)
+undefined
+>
+> const token = await ethers.getContractAt("IERC20", "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" )
+undefined
+> const myAddress = await signers[18].getAddress()
+undefined
+> await token.connect(impersonatedSigner).transfer(myAddress, "1000000")
+Uncaught:
+InvalidInputError: sender doesn't have enough funds to send tx. The max upfront
