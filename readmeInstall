@@ -55,6 +55,34 @@ undefined
 undefined
 > const myAddress = await signers[18].getAddress()
 undefined
-> await token.connect(impersonatedSigner).transfer(myAddress, "1000000")
+> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Uncaught:
 InvalidInputError: sender doesn't have enough funds to send tx. The max upfront
