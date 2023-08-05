@@ -125,6 +125,68 @@ ContractTransactionResponse {
 
 
 
+##### new session #####
+ npx hardhat console
+Welcome to Node.js v20.5.0.
+Type ".help" for more information.
+> const USCD_holder  = '0xcEe284F754E854890e311e3280b767F80797180d'
+undefined
+> const USDC_holder  = '0xcEe284F754E854890e311e3280b767F80797180d'
+undefined
+> await token.balanceOf(USDC_holder)
+Uncaught ReferenceError: token is not defined
+    at REPL3:1:39
+> const token = await ethers.getContractAt("IERC20", "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" )
+undefined
+>  const impersonatedSigner = await ethers.getSigner( USDC_holder )
+undefined
+> await network.provider.send("hardhat_setBalance", [ USDC_holder ,"0x1000000000000000000000",]);
+true
+> await network.provider.send("hardhat_impersonateAccount", [ USDC_holder ])
+true
+> const impersonatedSigner = await ethers.getSigner( USDC_holder )
+Uncaught SyntaxError: Identifier 'impersonatedSigner' has already been declared
+> const impersonatedSigner2 = await ethers.getSigner( USDC_holder )
+undefined
+> const signers = await ethers.getSigners();
+undefined
+> const s18 = await signers[18].getAddress()
+undefined
+> const s19 = await signers[19].getAddress()
+undefined
+> await token.connect(impersonatedSigner).transfer(s19, "2")
+ContractTransactionResponse {
+  provider: HardhatEthersProvider {
+    _hardhatProvider: LazyInitializationProviderAdapter {
+      _providerFactory: [AsyncFunction (anonymous)],
+      _emitter: [EventEmitter],
+      _initializingPromise: [Promise],
+      provider: [BackwardsCompatibilityProviderAdapter]
+    },
+    _networkName: 'hardhat',
+    _blockListeners: [],
+    _transactionHashListeners: Map(0) {},
+    _eventListeners: []
+  },
+  blockNumber: 17851918,
+  blockHash: '0x2d1660d33a9da29fccfe5a369b143ac8e6eb22042b6147071c47764a5b9827dc',
+  index: undefined,
+  hash: '0x31582369955f1469cf91dad7c6749104bcb6e12d439af144fdf5d344d76fccd8',
+  type: 2,
+  to: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+  from: '0xcEe284F754E854890e311e3280b767F80797180d',
+  nonce: 1,
+  gasLimit: 30000000n,
+  gasPrice: 13781196796n,
+  maxPriorityFeePerGas: 1000000000n,
+  maxFeePerGas: 26562393592n,
+  data: '0xa9059cbb0000000000000000000000008626f6940e2eb28930efb4cef49b2d1f2c9c11990000000000000000000000000000000000000000000000000000000000000002',
+  value: 0n,
+  chainId: 31337n,
+  signature: Signature { r: "0x000000000000000000000000000000000000000000000000000000009dacceeb", s: "0x00000000000000000000000000000000000000000000000000000000044cf33f", yParity: 1, networkV: null },
+  accessList: []
+}
+>
 
 
 
