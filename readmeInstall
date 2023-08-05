@@ -63,3 +63,17 @@ InvalidInputError: sender doesn't have enough funds to send tx. The max upfront 
 
 Uncaught:
 InvalidInputError: sender doesn't have enough funds to send tx. The max upfront
+
+
+
+
+
+await network.provider.send("hardhat_setBalance", [ addressWithTokens,"0x1000000000000000000000",]);
+ await token.connect(impersonatedSigner).transfer(address, "2")
+Uncaught:
+Error: VM Exception while processing transaction: reverted with reason string 'ERC20: transfer amount exceeds balance'
+    at <UnrecognizedContract>.<unknown> (0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48)
+    at <UnrecognizedContract>.<unknown> (0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48)
+
+
+
