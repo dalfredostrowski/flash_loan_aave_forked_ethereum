@@ -1,10 +1,24 @@
 
+sudo apt-get update
+curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh
+sudo bash nodesource_setup.sh
+sudo apt install nodejs build-essential
+npm install web3
+npm install --save-dev @nomiclabs/hardhat-ethers ethers @nomiclabs/hardhat-waffle ethereum-waffle chai
+npm i @openzeppelin/contracts@4.5.0
+npm i @aave/core-v3  dotenv
+
+mkdir forkEtherAAVEFlash
+cd forkEtherAAVEFlash/
+
+
+vi hardhat.config.js
 module.exports = {
         networks: {
                 hardhat: {
                 localhost: {
                         url: "https://ec2-54-149-194-207.us-west-2.compute.amazonaws.com:8545",
-                        accounts: ["d9c17d521f6104e918586d079ada62584a026e7b765130044f0abf6609ebb955"]
+                        accounts: ["XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"]
 ,                       chainId: 31337
               ,         gas: 1800
 
