@@ -24,6 +24,7 @@ module.exports = {
 ,
                         forking: {
                                 url: "https://cloudflare-eth.com/"
+,                       chainId: 31337
                     }
 
                 }
