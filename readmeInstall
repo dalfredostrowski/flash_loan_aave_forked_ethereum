@@ -9,7 +9,7 @@ npm i @aave/core-v3  dotenv
 
 mkdir forkEtherAAVEFlash
 cd forkEtherAAVEFlash/
-
+npx hardhat
 
 vi hardhat.config.js
 module.exports = {
