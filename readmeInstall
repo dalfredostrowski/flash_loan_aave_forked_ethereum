@@ -20,15 +20,12 @@ module.exports = {
                         url: "https://ec2-54-149-194-207.us-west-2.compute.amazonaws.com:8545",
                         accounts: ["XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"]
 ,                       chainId: 31337
-              ,         gas: 1800
-
-
+        
                 }
 ,
                         forking: {
                                 url: "https://cloudflare-eth.com/"
-, chainId: 31337
-, gas : 1800                    }
+                    }
 
                 }
    },
@@ -36,6 +33,94 @@ module.exports = {
         solidity: "0.8.10",
 };
 
+cd ..
+
+cd contracts
+
+
+vi FlashLoan.js
+
+pragma solidity 0.8.10;
+
+import {FlashLoanSimpleReceiverBase} from "@aave/core-v3/contracts/flashloan/base/FlashLoanSimpleReceiverBase.sol";
+import {IPoolAddressesProvider} from "@aave/core-v3/contracts/interfaces/IPoolAddressesProvider.sol";
+import {IERC20} from "@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
+
+
+
+
+
+contract FlashLoan is FlashLoanSimpleReceiverBase {
+    address payable owner;
+
+    constructor(address _addressProvider)
+        FlashLoanSimpleReceiverBase(IPoolAddressesProvider(_addressProvider))
+    {
+        owner = payable(msg.sender);
+    }
+
+    /**
+        This function is called after your contract has received the flash loaned amount
+     */
+    function executeOperation(
+        address asset,
+        uint256 amount,
+        uint256 premium,
+        address initiator,
+        bytes calldata params
+    ) external override returns (bool) {
+        //
+        // This contract now has the funds requested.
+        // Your logic goes here.
+        //
+
+        // At the end of your logic above, this contract owes
+        // the flashloaned amount + premiums.
+        // Therefore ensure your contract has enough to repay
+        // these amounts.
+
+        // Approve the Pool contract allowance to *pull* the owed amount
+        uint256 amountOwed = amount + premium;
+        IERC20(asset).approve(address(POOL), amountOwed);
+
+        return true;
+    }
+
+    function requestFlashLoan(address _token, uint256 _amount) public {
+        address receiverAddress = address(this);
+        address asset = _token;
+        uint256 amount = _amount;
+        bytes memory params = "";
+        uint16 referralCode = 0;
+
+        POOL.flashLoanSimple(
+            receiverAddress,
+            asset,
+            amount,
+            params,
+            referralCode
+        );
+    }
+
+    function getBalance(address _tokenAddress) external view returns (uint256) {
+        return IERC20(_tokenAddress).balanceOf(address(this));
+    }
+
+    function withdraw(address _tokenAddress) external onlyOwner {
+        IERC20 token = IERC20(_tokenAddress);
+        token.transfer(msg.sender, token.balanceOf(address(this)));
+    }
+
+    modifier onlyOwner() {
+        require(
+            msg.sender == owner,
+            "Only the contract owner can call this function"
+        );
+        _;
+    }
+
+    receive() external payable {}
+}
 
 
 npx hardhat node --hostname ec2-54-149-194-207.us-west-2.compute.amazonaws.com
@@ -43,9 +128,6 @@ npx hardhat node --hostname ec2-54-149-194-207.us-west-2.compute.amazonaws.com
 
 
 
-https://github.com/NomicFoundation/hardhat/issues/1933
-
-https://github.com/NomicFoundation/hardhat/issues/2593
 
 
 
@@ -54,158 +136,6 @@ ubuntu@ip-172-31-2-51:~/forkedMainnetFlash$ npx hardhat console
 Welcome to Node.js v20.5.0.
 Type ".help" for more information.
 > const signers = await ethers.getSigners();
-
-undefined
->
->
-> const addressWithTokens = "0x20a47086ad3450d06B30eFCeb254C854FeBFB36D"
-undefined
-> await network.provider.send("hardhat_impersonateAccount", [addressWithTokens])
-true
-> const impersonatedSigner = await ethers.getSigner(addressWithTokens)
-undefined
->
-> const token = await ethers.getContractAt("IERC20", "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" )
-undefined
-> const myAddress = await signers[18].getAddress()
-undefined
-> 
-
-> await token.connect(impersonatedSigner).transfer(myAddress, "1000000")
-Uncaught:
-InvalidInputError: sender doesn't have enough funds to send tx. The max upfront cost is: 962229651120000000 and the sender's account only has: 355686073134000
-
-Uncaught:
-InvalidInputError: sender doesn't have enough funds to send tx. The max upfront
-
-
-
-
-
-await network.provider.send("hardhat_setBalance", [ addressWithTokens,"0x1000000000000000000000",]);
- await token.connect(impersonatedSigner).transfer(address, "2")
-Uncaught:
-Error: VM Exception while processing transaction: reverted with reason string 'ERC20: transfer amount exceeds balance'
-    at <UnrecognizedContract>.<unknown> (0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48)
-    at <UnrecognizedContract>.<unknown> (0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48)
-
-
-
-USDC_holder = '<address from etherscan under 'holders' >'
-
-await network.provider.send("hardhat_setBalance", [ USDC_holder ,"0x1000000000000000000000",]);
-true
-> await ethers.provider.getBalance(USDC_holder)
-19342813113834066795298816n
-> await token.balanceOf(USDC_holder)
-1001584454459451n
-> await token.connect(impersonatedSigner2).transfer(s18, "1000000")
-ContractTransactionResponse {
-  provider: HardhatEthersProvider {
-    _hardhatProvider: LazyInitializationProviderAdapter {
-      _providerFactory: [AsyncFunction (anonymous)],
-      _emitter: [EventEmitter],
-      _initializingPromise: [Promise],
-      provider: [BackwardsCompatibilityProviderAdapter]
-    },
-    _networkName: 'hardhat',
-    _blockListeners: [],
-    _transactionHashListeners: Map(0) {},
-    _eventListeners: []
-  },
-  blockNumber: 17851042,
-  blockHash: '0xba6c4b13e8fe9c0dfc4bbd85bdfcdc66f1d82073aedd7e594d0b5856c6b2410a',
-  index: undefined,
-  hash: '0xe7ee0af56ef82538150e43e0e352f90caf7792932487cbccda5e26a6248e01e9',
-  type: 2,
-  to: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-  from: '0xcEe284F754E854890e311e3280b767F80797180d',
-  nonce: 1,
-  gasLimit: 30000000n,
-  gasPrice: 5686872134n,
-  maxPriorityFeePerGas: 1000000000n,
-  maxFeePerGas: 10373744268n,
-  data: '0xa9059cbb000000000000000000000000dd2fd4581271e230360230f9337d5c0430bf44c000000000000000000000000000000000000000000000000000000000000f4240',
-  value: 0n,
-  chainId: 31337n,
-  signature: Signature { r: "0x00000000000000000000000000000000000000000000000000000000ef4cb2d1", s: "0x0000000000000000000000000000000000000000000000000000000052c8203c", yParity: 1, networkV: null },
-  accessList: []
-}
-> await token.balanceOf(s18)
-1000000n
-> await ethers.provider.getBalance(s18)
-10000000000000000000000n
-
-
-
-
-##### new session #####
- npx hardhat console
-Welcome to Node.js v20.5.0.
-Type ".help" for more information.
-> const USCD_holder  = '0xcEe284F754E854890e311e3280b767F80797180d'
-undefined
-> const USDC_holder  = '0xcEe284F754E854890e311e3280b767F80797180d'
-undefined
-> await token.balanceOf(USDC_holder)
-Uncaught ReferenceError: token is not defined
-    at REPL3:1:39
-> const token = await ethers.getContractAt("IERC20", "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" )
-undefined
->  const impersonatedSigner = await ethers.getSigner( USDC_holder )
-undefined
-> await network.provider.send("hardhat_setBalance", [ USDC_holder ,"0x1000000000000000000000",]);
-true
-> await network.provider.send("hardhat_impersonateAccount", [ USDC_holder ])
-true
-> const impersonatedSigner = await ethers.getSigner( USDC_holder )
-Uncaught SyntaxError: Identifier 'impersonatedSigner' has already been declared
-> const impersonatedSigner2 = await ethers.getSigner( USDC_holder )
-undefined
-> const signers = await ethers.getSigners();
-undefined
-> const s18 = await signers[18].getAddress()
-undefined
-> const s19 = await signers[19].getAddress()
-undefined
-> await token.connect(impersonatedSigner).transfer(s19, "2")
-ContractTransactionResponse {
-  provider: HardhatEthersProvider {
-    _hardhatProvider: LazyInitializationProviderAdapter {
-      _providerFactory: [AsyncFunction (anonymous)],
-      _emitter: [EventEmitter],
-      _initializingPromise: [Promise],
-      provider: [BackwardsCompatibilityProviderAdapter]
-    },
-    _networkName: 'hardhat',
-    _blockListeners: [],
-    _transactionHashListeners: Map(0) {},
-    _eventListeners: []
-  },
-  blockNumber: 17851918,
-  blockHash: '0x2d1660d33a9da29fccfe5a369b143ac8e6eb22042b6147071c47764a5b9827dc',
-  index: undefined,
-  hash: '0x31582369955f1469cf91dad7c6749104bcb6e12d439af144fdf5d344d76fccd8',
-  type: 2,
-  to: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-  from: '0xcEe284F754E854890e311e3280b767F80797180d',
-  nonce: 1,
-  gasLimit: 30000000n,
-  gasPrice: 13781196796n,
-  maxPriorityFeePerGas: 1000000000n,
-  maxFeePerGas: 26562393592n,
-  data: '0xa9059cbb0000000000000000000000008626f6940e2eb28930efb4cef49b2d1f2c9c11990000000000000000000000000000000000000000000000000000000000000002',
-  value: 0n,
-  chainId: 31337n,
-  signature: Signature { r: "0x000000000000000000000000000000000000000000000000000000009dacceeb", s: "0x00000000000000000000000000000000000000000000000000000000044cf33f", yParity: 1, networkV: null },
-  accessList: []
-}
->
-
-
-
-
-
 ##### working!!!
 const USDC_holder  = '0xcEe284F754E854890e311e3280b767F80797180d'
 
@@ -227,6 +157,14 @@ await ethers.provider.getBalance(await signers[0].getAddress())
 
 #note i wento to search on etherscan.io for USDC token contract address... not from aave site.
 await deployedContract.requestFlashLoan('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',12)
+
+
+
+
+
+https://github.com/NomicFoundation/hardhat/issues/1933
+
+https://github.com/NomicFoundation/hardhat/issues/2593
 
 
 
